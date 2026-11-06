@@ -42,6 +42,12 @@ Petunia is a native internet-radio app for the PS5, and a Nightshade app by **[O
 
 Petunia is its own title, `PPSA99017`, so it installs **beside** ProsperoRadio (`PPSA99001`) instead of over it, and keeps its own data in `/data/petunia`. Your ProsperoRadio favourites and settings stay where they are and are not shared with Petunia. The playback, catalogue and interface are ProsperoRadio 01.000.010's; what Petunia changes is the name, the title, the look, the icon and pictures, the About page and the update source.
 
+## nightly insider
+
+**nightly insider** is early access to the Nightshade family's new builds for members of nightly on Discord. For now it covers Nightshade and Dulcamara: Nightshade builds after v1.010.012 and Dulcamara builds after 0.2.12 go to insiders first and are published on GitHub for everyone about two months later. Petunia's releases come out here as before.
+
+To become one, join [nightly on Discord](https://discord.gg/pSqgRU3YP9), verify, run `/rank Tester` in #bot-commands, then sign in with Discord at [nightly-insider.nightly-ps5.workers.dev](https://nightly-insider.nightly-ps5.workers.dev) to get your code.
+
 ## Install
 
 You need a PS5 with a compatible homebrew environment and title loader already set up, such as ShadowMountPlus. Petunia does not install or provide an exploit.
