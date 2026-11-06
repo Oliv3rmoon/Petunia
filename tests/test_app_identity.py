@@ -68,9 +68,10 @@ class AppIdentityTest(unittest.TestCase):
                 code = line.split("//", 1)[0]
                 if code.lstrip().startswith(("*", "/*")):
                     continue
-                if re.search(r'"[^"]*(Petunia|PPSA\d{5}|/data/[a-z]+")', code) or \
-                        re.search(r'"[^"]*ProsperoRadio[^"]*"', code) and \
-                        "release of ProsperoRadio" not in code and "[ProsperoRadio]" not in code:
+                # ProsperoRadio as the app's name in a message ("Close ProsperoRadio?"), not as a
+                # repository, a log tag or the app Petunia is a release of.
+                old_name = re.search(r'"[^"]*(?<![/\[])ProsperoRadio( [a-z]|\?|")', code)
+                if re.search(r'"[^"]*(Petunia|PPSA\d{5}|/data/[a-z]+")', code) or old_name:
                     found.append(f"{path.relative_to(ROOT)}:{number}: {line.strip()}")
         self.assertEqual(found, [])
 

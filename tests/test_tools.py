@@ -222,18 +222,20 @@ class ToolTests(unittest.TestCase):
         self.assertIn("Expected one app-folder ZIP and SHA256SUMS", workflow)
         self.assertIn("sha256sum -c SHA256SUMS", workflow)
         self.assertIn('assets=("release/$ARCHIVE" "release/$CHECKSUM")', workflow)
-        # The release job creates a release, or fills one that has no ZIP; it never replaces,
-        # deletes or rewrites anything on a release that exists.
-        for forbidden in ("--clobber", "delete-asset", "gh release edit"):
+        # The release job fills the tag's release (a draft made first) when it has no ZIP, or
+        # makes a draft pre-release when there is none; it never replaces, deletes or rewrites
+        # anything on a release that exists, and never publishes one (Petunia).
+        for forbidden in ("--clobber", "delete-asset", "gh release edit", "--draft=false"):
             self.assertNotIn(forbidden, workflow)
-        publish = workflow[workflow.index("- name: Publish GitHub release") :]
+        publish = workflow[workflow.index("- name: Put the files on the GitHub release") :]
         self.assertIn('gh release create "$TAG" ', publish)
         self.assertIn('gh release upload "$TAG" ', publish)
         self.assertIn("--json assets --jq '.assets[].name'", publish)
-        self.assertIn("if [[ $name == *.zip ]]; then", publish)
+        self.assertIn('if grep -qx "$ARCHIVE" <<< "$names"; then', publish)
         self.assertIn("::warning title=Release files not from this run::", publish)
-        self.assertLess(publish.index("gh release create"), publish.index("::warning"))
+        self.assertIn("--draft --prerelease --latest=false", publish)
         self.assertLess(publish.index("::warning"), publish.index("gh release upload"))
+        self.assertLess(publish.index("gh release upload"), publish.index("gh release create"))
 
     def test_release_zip_is_attested_before_upload(self):
         workflow = (ROOT / ".github/workflows/tooling.yml").read_text(encoding="utf-8")
@@ -268,9 +270,10 @@ class ToolTests(unittest.TestCase):
         self.assertIn("PR_HEAD: ${{ github.event.pull_request.head.sha }}", workflow)
         self.assertIn("name: ${{ steps.label.outputs.artifact }}", workflow)
         # The release job still finds a tag's build under its commit.
-        self.assertIn('--name "prospero-radio-$GITHUB_SHA-release"', workflow)
+        # Petunia: named by the app's data name (tools/app-identity.py), petunia-<commit>-release.
+        self.assertIn('--name "$DATA_NAME-$GITHUB_SHA-release"', workflow)
         self.assertIn(
-            'echo "artifact=prospero-radio-$GITHUB_SHA-release" >> "$GITHUB_OUTPUT"', workflow
+            'echo "artifact=$DATA_NAME-$GITHUB_SHA-release" >> "$GITHUB_OUTPUT"', workflow
         )
         # The label is in the environment before the folder is built and archived.
         self.assertLess(workflow.index("- name: Name this build"), workflow.index("run: make app"))

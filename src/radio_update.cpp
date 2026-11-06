@@ -77,7 +77,7 @@ constexpr bool prospero_radio_repository(const char *repository)
            same_repository(repository, "blackbearreloaded/prosperoradio");
 }
 static_assert(!prospero_radio_repository(kUpdateRepository),
-              "updates come from Petunia's releases, never ProsperoRadio's");
+              "updates come from " APP_TITLE_NAME "'s releases, never ProsperoRadio's");
 static_assert(prospero_radio_repository("bornaradusin/ProsperoRadio") &&
               prospero_radio_repository("BlackBearReloaded/ProsperoRadio"));
 

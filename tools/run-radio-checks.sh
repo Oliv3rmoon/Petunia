@@ -11,6 +11,11 @@ cd "$root"
 cxx=${CXX:-clang++-18}
 out=build/tests/radio-checks
 cxxflags=(-std=c++20 -O2 -Wall -Wextra -Werror -Iinclude)
+# Petunia: the identity the build gives every source (tools/app-identity.py); radio_service.cpp
+# names the app in its user agent.
+identity=$(python3 tools/app-identity.py --defines)
+mapfile -t identity_flags <<< "$identity"
+cxxflags+=("${identity_flags[@]}")
 mkdir -p -- "$out"
 
 run_check() {

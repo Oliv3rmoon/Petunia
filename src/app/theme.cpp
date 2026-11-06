@@ -14,8 +14,8 @@ ui::Theme night_signal()
     // light); the palette and the corners are Nightshade's, with Petunia's
     // chartreuse for its red; the pace is ProsperoRadio's own.
     ui::Theme t = ui::themes()[0];
-    t.id = "petunia";
-    t.name = "Petunia";
+    t.id = APP_DATA_NAME;
+    t.name = APP_TITLE_NAME;
     t.family = "Frosted glass";
     t.summary = "Black glass over a near-black sky with a low chartreuse glow";
 
