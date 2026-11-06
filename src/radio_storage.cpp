@@ -19,16 +19,18 @@ extern "C" int radio_preload_modules(int *results, unsigned capacity);
 namespace
 {
 
-constexpr const char *kTitleId = "PPSA99001";
+// Petunia: the title ID and the data folder's name come from param.json (APP_TITLE_ID,
+// APP_DATA_NAME; tools/app-identity.py, given by the build).
+constexpr const char *kTitleId = APP_TITLE_ID;
 constexpr const char *kDataParent = "/data";
-constexpr const char *kDataDir = "/data/prosperoradio";
-constexpr const char *kInstallDir = "/data/homebrew/PPSA99001";
+constexpr const char *kDataDir = "/data/" APP_DATA_NAME;
+constexpr const char *kInstallDir = "/data/homebrew/" APP_TITLE_ID;
 // Where the PS5 mounts the app it runs, whatever ShadowMountPlus mounted it
 // from: a folder on /data, on an extended or USB drive, or an image.
-constexpr const char *kMountedApp = "/system_ex/app/PPSA99001";
+constexpr const char *kMountedApp = "/system_ex/app/" APP_TITLE_ID;
 // A title's sandbox, seen from the console's own root.
-constexpr const char *kSandboxApp = "/mnt/sandbox/PPSA99001_000/app0";
-constexpr const char *kSandboxData = "/mnt/sandbox/PPSA99001_000/download0";
+constexpr const char *kSandboxApp = "/mnt/sandbox/" APP_TITLE_ID "_000/app0";
+constexpr const char *kSandboxData = "/mnt/sandbox/" APP_TITLE_ID "_000/download0";
 
 struct Entry
 {
@@ -41,7 +43,7 @@ constexpr Entry kFiles[RADIO_FILE_COUNT] = {
     {"config", "radio-browser-favorites.bin"},
     {"config", "radio-browser-favorites.tmp"},
     {"catalog", "radio-browser-cache.bin"},
-    {"logs", "prosperoradio.log"},
+    {"logs", APP_DATA_NAME ".log"},
     {"config", "settings.txt"},
     {"config", "self-update-sequence"},
 };

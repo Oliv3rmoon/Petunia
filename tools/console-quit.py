@@ -12,15 +12,19 @@ import io
 import sys
 import time
 from ftplib import FTP, all_errors
+from pathlib import Path
 
-TITLE = "PPSA99001"
+# Petunia: the title and the data folder's name come from param.json (tools/app-identity.py).
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+IDENTITY = __import__("app-identity").identity()
+TITLE = IDENTITY["APP_TITLE_ID"]
 PATH = f"/data/homebrew/{TITLE}/dev/quit.txt"
 
 
 def session(host):
     ftp = FTP()
     ftp.connect(host, 2121, timeout=20)
-    ftp.login("anonymous", "prosperoradio")
+    ftp.login("anonymous", IDENTITY["APP_DATA_NAME"])
     return ftp
 
 

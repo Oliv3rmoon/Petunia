@@ -41,7 +41,10 @@ import time
 from ftplib import FTP, all_errors, error_perm
 from pathlib import Path
 
-DATA = "/data/prosperoradio"
+# Petunia: the data folder is named after the app (tools/app-identity.py, from param.json).
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+NAME = __import__("app-identity").identity()["APP_DATA_NAME"]
+DATA = f"/data/{NAME}"
 BAD_LOG_WORDS = ("fatal", "assertion")
 BAD_KLOG_WORDS = ("panic", "crash", "coredump", "segv", "sigsegv")
 
@@ -73,7 +76,7 @@ class Console:
     def __init__(self, host, port):
         self.ftp = FTP()
         self.ftp.connect(host, port, timeout=30)
-        self.ftp.login("anonymous", "prosperoradio")
+        self.ftp.login("anonymous", NAME)
         self.ftp.voidcmd("TYPE I")
         for _ in range(2):
             try:
@@ -280,7 +283,7 @@ def main():
             done.set()
             stop("the console stopped answering during the run; do not retry, look at klog.txt")
 
-    # With filesystem access the app writes under /data/prosperoradio, which a
+    # With filesystem access the app writes under /data/<NAME>, which a
     # PC can read at any time; without it, in its own storage, which is only
     # there while the title runs.
     places = [f"{DATA}/dev", f"/mnt/sandbox/{title}_000/download0/dev"]
@@ -316,7 +319,7 @@ def main():
     if report:
         (results / "report.txt").write_text(report)
     logs = f"{DATA}/logs" if dev.startswith(DATA) else dev.rsplit("/", 1)[0]
-    log = console.read(f"{logs}/prosperoradio.log") or b""
+    log = console.read(f"{logs}/{NAME}.log") or b""
     (results / "app.log").write_bytes(log)
     pictures = sorted(name for name in (console.entries(dev) or {}) if name.endswith(".bmp"))
     for name in pictures:
@@ -342,7 +345,7 @@ def main():
         if closed:
             # The log's last lines are written as the app closes.
             console = connect()
-            log = console.read(f"{logs}/prosperoradio.log") or log
+            log = console.read(f"{logs}/{NAME}.log") or log
             (results / "app.log").write_bytes(log)
             console.close()
     time.sleep(3)

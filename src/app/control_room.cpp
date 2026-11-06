@@ -435,26 +435,42 @@ void ControlRoom::draw_about(ui::Canvas &canvas, const Rect &box) const
     const ui::Theme &theme = session_.theme;
     float y = box.y + 30.0f;
     draw_logo(list, box.x + 34.0f, y + 6.0f, 52.0f, tone::teal);
-    ui::text(list, fonts.display, "ProsperoRadio", box.x + 84.0f, y + 20.0f, 40.0f, theme.text);
+    ui::text(list, fonts.display, APP_TITLE_NAME, box.x + 84.0f, y + 20.0f, 40.0f, theme.text);
     ui::text(list, fonts.mono, "Version " + version_, box.x + 84.0f, y + 58.0f, 22.0f,
              theme.text_muted);
     y += 118.0f;
-    ui::text(list, fonts.regular, "Brought to you by", box.x, y, 25.0f, theme.text_muted);
-    ui::text(list, fonts.semibold, "BlackBearReloaded",
-             box.x + fonts.regular.measure("Brought to you by ", 25.0f), y, 25.0f, tone::teal);
-    y += 64.0f;
+    // Petunia: ProsperoRadio's creator and its continuer first, then this release's own lines.
+    const char *credits[][2] = {{"Created by ", "BlackBearReloaded"},
+                                {"Continued by ", "bornaradusin"}};
+    for (const auto &credit : credits)
+    {
+        ui::text(list, fonts.regular, credit[0], box.x, y, 25.0f, theme.text_muted);
+        ui::text(list, fonts.semibold, credit[1], box.x + fonts.regular.measure(credit[0], 25.0f),
+                 y, 25.0f, tone::teal);
+        y += 42.0f;
+    }
+    y += 22.0f;
+    // An empty line is a smaller gap.
     const char *lines[] = {
+        APP_TITLE_NAME " is Oliv3rmoon's Nightshade-family release of ProsperoRadio.",
+        "Community: nightly on Discord, discord.gg/pSqgRU3YP9",
+        "",
         "Station catalogue, metadata, search and discovery: Radio Browser,",
         "a free and open community project. Thank you to its maintainers.",
         "www.radio-browser.info",
         "",
         "Your favourites, settings and the saved catalogue are kept in",
-        "/data/prosperoradio on this console.",
+        "/data/" APP_DATA_NAME " on this console.",
     };
     for (const char *line : lines)
     {
-        ui::text(list, fonts.regular, line, box.x, y, 25.0f, theme.text_muted);
-        y += 40.0f;
+        if (line[0] == '\0')
+        {
+            y += 16.0f;
+            continue;
+        }
+        ui::text(list, fonts.regular, line, box.x, y, 23.0f, theme.text_muted);
+        y += 36.0f;
     }
 }
 

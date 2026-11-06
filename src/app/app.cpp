@@ -30,10 +30,10 @@ enum MenuTag : int
     kMenuClose,
 };
 
-constexpr const char *kCredits =
-    "ProsperoRadio's station catalogue, metadata, search and discovery are powered by the "
+constexpr const char *kCredits = APP_TITLE_NAME
+    "'s station catalogue, metadata, search and discovery are powered by the "
     "free and open Radio Browser community.\n"
-    "Thank you to its maintainers and contributors. ProsperoRadio would not be possible "
+    "Thank you to its maintainers and contributors. " APP_TITLE_NAME " would not be possible "
     "without their work.\n"
     "www.radio-browser.info";
 
@@ -164,7 +164,7 @@ void App::open_menu(ui::Feedback &feedback)
     ui::MenuItem line;
     line.separator = true;
     items.push_back(line);
-    add("Close ProsperoRadio", kMenuClose);
+    add("Close " APP_TITLE_NAME, kMenuClose);
     items.back().danger = true;
     menu_.set_items(std::move(items));
     menu_.open({gfx::kVirtualWidth - kMargin - 160.0f, kHeaderY - 20.0f, 160.0f, 40.0f}, feedback);
@@ -208,9 +208,13 @@ void App::run_menu(int tag, ui::Feedback &feedback)
         ui::DialogContent content;
         content.icon = ui::StatusKind::info;
         content.title = "Powered by Radio Browser";
-        content.body = std::string(kCredits) + "\nProsperoRadio " + version_ +
-                       ", originally developed by BlackBearReloaded, who has stepped down. Now developed and maintained by bornaradusin.";
-        content.buttons = {{"Back to ProsperoRadio", ui::ButtonKind::primary}};
+        // Petunia: Oliv3rmoon's release of ProsperoRadio, which BlackBearReloaded created and
+        // bornaradusin continues.
+        content.body = std::string(kCredits) + "\n" APP_TITLE_NAME " " + version_ +
+                       " is Oliv3rmoon's release of ProsperoRadio, created by BlackBearReloaded "
+                       "and continued by bornaradusin.\n"
+                       "Community: nightly on Discord, discord.gg/pSqgRU3YP9";
+        content.buttons = {{"Back to " APP_TITLE_NAME, ui::ButtonKind::primary}};
         about_.open(std::move(content), feedback);
         break;
     }
@@ -218,7 +222,7 @@ void App::run_menu(int tag, ui::Feedback &feedback)
     {
         ui::DialogContent content;
         content.icon = ui::StatusKind::question;
-        content.title = "Close ProsperoRadio?";
+        content.title = "Close " APP_TITLE_NAME "?";
         content.body = session_.active() ? "The station stops playing." : "";
         content.buttons = {{"Stay"}, {"Close", ui::ButtonKind::primary, true}};
         closing_.open(std::move(content), feedback);
@@ -513,7 +517,7 @@ void App::draw_header(ui::Canvas &canvas) const
     gfx::DrawList &list = canvas.list;
     const ui::Fonts &fonts = canvas.fonts;
     draw_logo(list, kMargin + 22.0f, kHeaderY, 44.0f, tone::teal);
-    ui::text(list, fonts.display, "ProsperoRadio", kMargin + 58.0f, baseline_for(kHeaderY, 30.0f),
+    ui::text(list, fonts.display, APP_TITLE_NAME, kMargin + 58.0f, baseline_for(kHeaderY, 30.0f),
              30.0f, session_.theme.text);
 
     tabs_.draw(canvas);

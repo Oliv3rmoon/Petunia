@@ -22,7 +22,10 @@ pacbrew="$root/.deps/pacbrew/v0.40.2/sysroot/user/homebrew/include"
 bash "$root/tools/prepare-opengl.sh" >/dev/null
 ui_kit=$(bash "$root/tools/prepare-ui-kit.sh")
 harfbuzz=$(bash "$root/tools/fetch-harfbuzz.sh")
-app_includes=(-DSDL_MAIN_HANDLED -DSDL_STATIC_LIB -DGL_GLEXT_PROTOTYPES=1 \
+# Petunia: the identity the build gives every source (tools/app-identity.py).
+identity=$(python3 "$root/tools/app-identity.py" --defines)
+mapfile -t identity_flags <<< "$identity"
+app_includes=(-DSDL_MAIN_HANDLED -DSDL_STATIC_LIB -DGL_GLEXT_PROTOTYPES=1 "${identity_flags[@]}" \
     -I"$root/include" -I"$root/src" -I"$ui_kit/src" \
     -I"$root/vendor/ps5/sdl/include" -I"$root/vendor/ps5/sdl/include/SDL2" \
     -isystem "$root/vendor/stb" -isystem "$harfbuzz/src" \

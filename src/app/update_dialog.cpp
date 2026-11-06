@@ -634,7 +634,7 @@ void UpdateDialog::draw(ui::Canvas &canvas) const
                     kPale);
         centred(fonts.regular, "Your favorites, settings and catalogue are kept.", 651.0f, 20.0f,
                 copy);
-        centred(fonts.regular, "ProsperoRadio closes to finish the update.", 679.0f, 20.0f, copy);
+        centred(fonts.regular, APP_TITLE_NAME " closes to finish the update.", 679.0f, 20.0f, copy);
         if (has_notes())
         {
             static constexpr const char *kLabels[] = {"Update now", "What's new", "Skip"};
@@ -757,7 +757,8 @@ void UpdateDialog::draw(ui::Canvas &canvas) const
         list.pop_transform();
 
         centred(fonts.display, "Update ready", 536.0f, 46.0f, title);
-        centred(fonts.regular, "ProsperoRadio closes now.", 585.0f, 24.0f, title.with_alpha(0.86f));
+        centred(fonts.regular, APP_TITLE_NAME " closes now.", 585.0f, 24.0f,
+                title.with_alpha(0.86f));
         centred(fonts.regular, "Open it again to use version " + update_.version + ".", 617.0f,
                 20.0f, copy);
         const float left = 1.0f - tween::clamp01(t / kClosingSeconds);
@@ -776,7 +777,7 @@ void UpdateDialog::draw(ui::Canvas &canvas) const
         list.circle(kCenterX + shake, kRingY + 38.0f, 7.0f, accent);
 
         centred(fonts.display, "The update could not finish", 536.0f, 38.0f, title);
-        centred(fonts.regular, "ProsperoRadio was not changed.", 587.0f, 24.0f,
+        centred(fonts.regular, APP_TITLE_NAME " was not changed.", 587.0f, 24.0f,
                 title.with_alpha(0.86f));
         if (!progress_.error.empty())
             centred(fonts.regular, progress_.error, 627.0f, 20.0f, copy);

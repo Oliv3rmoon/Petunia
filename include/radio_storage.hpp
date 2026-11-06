@@ -5,10 +5,11 @@
 #pragma once
 
 // With filesystem access (upstream Lapy, asked for first thing in main)
-// everything ProsperoRadio writes lives under /data/prosperoradio:
+// everything the app writes lives under /data/<APP_DATA_NAME>, /data/petunia
+// (tools/app-identity.py):
 //   catalog/   the station catalogue and its staging copy
 //   config/    favourites (and settings)
-//   logs/      prosperoradio.log and the previous session's
+//   logs/      petunia.log and the previous session's
 // and the app's own files are read from where the PS5 mounted it. Without it
 // (no resident Lapy service and no ELF loader on the console, or the request
 // failed) the sandbox paths stay:

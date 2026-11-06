@@ -65,7 +65,9 @@
 #define CATALOG_REFRESH_SECONDS (12 * 60 * 60)
 #define CATALOG_THREAD_STACK_SIZE (4U * 1024U * 1024U)
 #define CATALOG_PAGE_CACHE_SIZE (64U * 1024U * 1024U)
-#define USER_AGENT "ProsperoRadio/0.2.0 (+https://www.radio-browser.info/)"
+// Radio Browser asks for a user agent that says which app is asking: Petunia names itself and
+// its repository (tools/app-identity.py).
+#define USER_AGENT APP_TITLE_NAME " (+https://github.com/" APP_UPDATE_REPOSITORY ")"
 #define JSON_CAPACITY (16U * 1024U * 1024U)
 #define STREAM_BUFFER_SIZE (64U * 1024U)
 #define PCM_BUFFER_SIZE (2048U * 2U * 2U)

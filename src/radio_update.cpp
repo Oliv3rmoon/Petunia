@@ -123,7 +123,7 @@ bool development_offer(self_update_offer *out)
     self_update_offer filled{};
     std::snprintf(filled.title, sizeof(filled.title), "%s", g_title);
     std::snprintf(filled.installed, sizeof(filled.installed), "%s", g_installed);
-    std::snprintf(filled.name, sizeof(filled.name), "ProsperoRadio");
+    std::snprintf(filled.name, sizeof(filled.name), "%s", APP_TITLE_NAME);
     std::snprintf(filled.available, sizeof(filled.available), "%s", available.c_str());
     std::snprintf(filled.version, sizeof(filled.version), "%s", version.c_str());
     std::snprintf(filled.artifact, sizeof(filled.artifact), "%s", artifact.c_str());

@@ -76,6 +76,11 @@ print(title_id, value["contentVersion"])
 PY
 )
 
+# Petunia: the app's name, title ID, data folder and update repository, from param.json alone
+# (tools/app-identity.py), as definitions every source is compiled with.
+identity=$(python3 "$root/tools/app-identity.py" --defines)
+mapfile -t identity_flags <<< "$identity"
+
 # Loader/container constants validated on firmware 6.02 and 12.70. These are
 # deliberately separate from the public application version in param.json.
 module_sdk=0x02000009
@@ -194,7 +199,7 @@ for source in "${sources[@]}"; do
         }
         args+=("-I$root/$include")
     done
-    args+=("${pacbrew_cflags[@]}")
+    args+=("${pacbrew_cflags[@]}" "${identity_flags[@]}")
     PS5_PAYLOAD_SDK="$sdk_root" sh "$root/tooling/prospero-clang18" \
         "${args[@]}" -c "$root/$source" -o "$object" &
     compile_pids+=($!)

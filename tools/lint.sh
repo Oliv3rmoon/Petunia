@@ -25,8 +25,9 @@ for file in "${repository_files[@]}"; do
             ;;
         *.c|*.cc|*.cpp|*.h|*.hpp|*.ld|*.py|*.ps1|*.sh|*.yml|*.yaml|Makefile|.clang-format|.clang-tidy|.env.example)
             header=$(head -n 20 "$file")
-            grep -Eq 'ps5-native-app-boilerplate|ps5-homebrew-ui|ProsperoRadio' <<<"$header"
-            grep -Fq 'Copyright (C) 2026 BlackBearReloaded' <<<"$header"
+            # Petunia: Oliv3rmoon's own files name him and Petunia.
+            grep -Eq 'ps5-native-app-boilerplate|ps5-homebrew-ui|ProsperoRadio|Petunia' <<<"$header"
+            grep -Eq 'Copyright \(C\) 2026 (BlackBearReloaded|Oliv3rmoon)' <<<"$header"
             grep -Fq 'SPDX-License-Identifier: GPL-3.0-or-later' <<<"$header"
             ((checked += 1))
             ;;
