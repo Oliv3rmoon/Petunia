@@ -4,14 +4,18 @@ This repository can turn ordinary developer-owned artwork and audio into the
 launcher formats supported by this template. Conversion changes only the
 repository's `sce_sys` files; it does not connect to or configure a console.
 
-The checked-in ProsperoRadio artwork shares the interface's dark teal look.
-`icon0.png` is a dark green table radio on a teal-black ground,
-`background-source.png` is the app-selection background (a metal music note
-set to the right, clear of the home screen's text), and
-`launch-background-source.png` is the launch-transition background (the same
-note, centred).
-The two background sources are retained at 3840x2160; `pic0.dds` and
-`pic1.dds` are their deployment-ready BC7 derivatives.
+The checked-in Petunia artwork shares the interface's look: Nightshade's near
+black with Petunia's chartreuse. `icon0.png` is Petunia's logo, a chartreuse
+petunia whose trumpet is a speaker horn with sound waves, resized to 512x512
+from `assets/branding/petunia-logo-1024.png`; no script draws it, so replace
+it by resizing a new logo. `background-source.png` is the app-selection
+background (the petunia set to the right, clear of the home screen's text,
+its sound going out to the upper right), and `launch-background-source.png` is
+the launch-transition background (the petunia centred in a ring of light).
+`tools/render-home-art.py` draws both from the logo (Pillow and NumPy) and
+writes `pic0.dds` and `pic1.dds`, their deployment-ready BC7 derivatives; the
+two sources are retained at 3840x2160. `assets/branding/` is kept out of the
+package.
 
 ## What you can customize
 

@@ -359,6 +359,8 @@ for asset in icon0.png pic0.dds pic1.dds snd0.at9; do
     [[ -f $root/sce_sys/$asset ]] && cp "$root/sce_sys/$asset" "$app/sce_sys/$asset"
 done
 [[ ! -d $root/assets ]] || cp -a "$root/assets" "$app/assets"
+# Petunia: the logo's 1024-pixel source is for the repository, not the console (icon0.png is it).
+rm -rf -- "$app/assets/branding"
 # The interface's baked fonts come with the kit.
 mkdir -p "$app/assets/fonts"
 cp -a "$ui_kit/assets/fonts/." "$app/assets/fonts/"

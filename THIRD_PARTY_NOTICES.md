@@ -61,3 +61,15 @@ of the package.
 
 The maintainer-supplied launcher artwork is part of the
 project and is covered by its licence.
+
+In Petunia, Oliv3rmoon's release of ProsperoRadio, the icon and the
+home-screen pictures take the place of ProsperoRadio's artwork.
+
+Petunia's icon is its own logo, made for this project
+(`assets/branding/petunia-logo-1024.png`, and `sce_sys/icon0.png` resized from
+it), Copyright (C) 2026 Oliv3rmoon, distributed under GPL-3.0-or-later.
+
+The home-screen pictures (`pic0.dds` and `pic1.dds` with their source PNGs)
+are drawn from that logo by `tools/render-home-art.py`, after Datura's,
+Physalis's and Nightshade's (Oliv3rmoon/Nightshade), Copyright (C) 2026
+Oliv3rmoon, and distributed under GPL-3.0-or-later.
