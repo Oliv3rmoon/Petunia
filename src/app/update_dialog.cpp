@@ -141,7 +141,8 @@ void UpdateDialog::begin(ui::Feedback &feedback)
 
 // ---- the notes ----
 
-// The notes are plain text as the catalog gives them: lines split by '\n',
+// The notes are plain text as the update check gives them (github_release_notes
+// makes them from the release's Markdown): lines split by '\n',
 // list items starting "- ", callouts starting "Warning:" or "Note:", and short
 // lines without closing punctuation that read as headings.
 void UpdateDialog::layout_notes()
@@ -216,7 +217,7 @@ void UpdateDialog::layout_notes()
     {
         y += 20.0f;
         NoteLine out;
-        out.text = "The rest is on the app's page on prosperostore.net.";
+        out.text = "The rest is on the release's page on GitHub.";
         out.y = y;
         out.height = std::round(kNoteSize * 1.6f);
         out.size = kNoteSize;

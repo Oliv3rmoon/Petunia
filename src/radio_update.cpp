@@ -3,11 +3,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // Both are the PS5 Native App Boilerplate's self-update kit
-// (third_party/update_check, see its README.md), as ProsperoEden uses it. Once
-// per launch the app asks the prosperostore.net catalog for its own entry, checks
-// the catalog's Ed25519 signature and compares the listed content version with
-// this build's (sce_sys/param.json). The update downloads the release ZIP from
-// GitHub over HTTPS and streams it to the self-update helper
+// (third_party/update_check, see its README.md), as ProsperoEden uses it.
+// Petunia: once per launch the app asks GitHub for the newest release of
+// kUpdateRepository (Oliv3rmoon/Petunia; github_release.h), not the catalog,
+// which lists ProsperoRadio's own releases: a release that is no draft or
+// pre-release, tagged with a content version higher than this build's
+// (sce_sys/param.json), carrying <title ID>.zip and the SHA256SUMS that gives
+// its SHA-256. The update downloads that ZIP from GitHub over HTTPS and
+// streams it to the self-update helper
 // (self-updater.elf in the app's folder), which the app sends to the console's
 // payload loader: the helper checks and unpacks the release beside the app,
 // and once the app has closed it replaces the app's files and posts a
@@ -16,6 +19,7 @@
 
 #include "app/platform.hpp"
 
+#include "../third_party/update_check/github_release.h"
 #include "../third_party/update_check/self_update.h"
 #include "../third_party/update_check/update_check.h"
 #include "core/save_file.hpp"
@@ -47,6 +51,35 @@ namespace
 {
 
 namespace sys = hui::sys;
+
+// The repository whose releases are offered, and the name the helper's
+// notification gives the app: both follow param.json's titleName
+// (tools/app-identity.py). ProsperoRadio's own repositories are refused: an
+// update from them would undo the name, the title, the look and this update
+// source.
+constexpr const char *kUpdateRepository = APP_UPDATE_REPOSITORY;
+constexpr const char *kAppName = APP_TITLE_NAME;
+
+constexpr bool same_repository(const char *a, const char *b)
+{
+    const auto lower = [](char c) { return c >= 'A' && c <= 'Z' ? static_cast<char>(c + 32) : c; };
+    for (; *a != '\0' && *b != '\0'; ++a, ++b)
+    {
+        if (lower(*a) != *b)
+            return false;
+    }
+    return *a == *b;
+}
+
+constexpr bool prospero_radio_repository(const char *repository)
+{
+    return same_repository(repository, "bornaradusin/prosperoradio") ||
+           same_repository(repository, "blackbearreloaded/prosperoradio");
+}
+static_assert(!prospero_radio_repository(kUpdateRepository),
+              "updates come from Petunia's releases, never ProsperoRadio's");
+static_assert(prospero_radio_repository("bornaradusin/ProsperoRadio") &&
+              prospero_radio_repository("BlackBearReloaded/ProsperoRadio"));
 
 // libcurl and OpenSSL want more stack than a default thread of the console has.
 constexpr std::size_t kStackSize = 1024U * 1024U;
@@ -99,9 +132,9 @@ bool next_line(const std::string &text, std::size_t *at, std::string *line)
     return !line->empty();
 }
 
-// A test's switch: dev/update-offer.txt in the app folder replaces the
-// catalog's answer (and so skips the catalog's signature), so an update can be
-// tried before the catalog lists a newer release. Five lines, as the
+// A test's switch: dev/update-offer.txt in the app folder replaces GitHub's
+// answer (and so skips the release's SHA256SUMS), so an update can be tried
+// before a newer release is published. Five lines, as the
 // boilerplate's example takes them: the new content version, the release's
 // name, its ZIP on GitHub, its SHA-256, its size in bytes; any further lines
 // are the release notes.
@@ -123,7 +156,7 @@ bool development_offer(self_update_offer *out)
     self_update_offer filled{};
     std::snprintf(filled.title, sizeof(filled.title), "%s", g_title);
     std::snprintf(filled.installed, sizeof(filled.installed), "%s", g_installed);
-    std::snprintf(filled.name, sizeof(filled.name), "%s", APP_TITLE_NAME);
+    std::snprintf(filled.name, sizeof(filled.name), "%s", kAppName);
     std::snprintf(filled.available, sizeof(filled.available), "%s", available.c_str());
     std::snprintf(filled.version, sizeof(filled.version), "%s", version.c_str());
     std::snprintf(filled.artifact, sizeof(filled.artifact), "%s", artifact.c_str());
@@ -134,7 +167,7 @@ bool development_offer(self_update_offer *out)
     while (!notes.empty() && (notes.back() == '\n' || notes.back() == '\r'))
         notes.pop_back();
     std::snprintf(filled.notes, sizeof(filled.notes), "%s", notes.c_str());
-    // Like the catalog, only a newer version is offered (content versions
+    // Like GitHub's check, only a newer version is offered (content versions
     // compare as text).
     if (std::strcmp(filled.available, filled.installed) <= 0)
         return false;
@@ -146,11 +179,19 @@ void *check(void *)
 {
     self_update_offer result{};
     self_update_check_result state = SELF_UPDATE_UNKNOWN;
+    github_release_report report{};
     if (radio_http_init() >= 0) // libcurl is set up once, by the service's layer
-        state = self_update_check(self_update_console(), g_title, g_installed, &result);
+    {
+        state = self_update_check_as_from(kUpdateRepository, kAppName, g_title, g_installed,
+                                          &result, &report);
+        sys::log("[RADIO] update check: github %s releases: %s (HTTP %d, error %d, redirects %d, "
+                 "tag %s)",
+                 kUpdateRepository, github_release_reason_text(report.reason), report.http_status,
+                 report.platform_error, report.redirects, report.tag[0] != '\0' ? report.tag : "-");
+    }
     if (development_offer(&result))
     {
-        sys::log("[RADIO] update check: dev/update-offer.txt replaces the catalog's answer");
+        sys::log("[RADIO] update check: dev/update-offer.txt replaces GitHub's answer");
         state = SELF_UPDATE_AVAILABLE;
     }
     sys::log("[RADIO] update check: result=%s installed=%s available=%s version=%s size=%llu",

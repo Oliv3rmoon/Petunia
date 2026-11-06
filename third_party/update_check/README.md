@@ -26,3 +26,30 @@ and `mounted_source`, which takes the installed folder from ShadowMountPlus's
 In the kit itself (ProsperoEden's change), `self_update_check` also copies the
 catalog entry's `release_notes` and `release_notes_truncated` into the offer
 (`notes`, `notes_truncated`), for the update dialog's What's new view.
+
+## Petunia: updates from GitHub releases
+
+`github_release.{h,c}` are Nightshade's (Oliv3rmoon/Nightshade,
+`headless/update_check/github_release.*`), as Nightshade TV and Datura have them, for this
+repository's releases: the app asks GitHub for the newest release of the repository it names
+(`kUpdateRepository` in `src/radio_update.cpp`, `Oliv3rmoon/Petunia`, from param.json's
+`titleName` by `tools/app-identity.py`) instead of the catalog, and fills the same offer, so the
+download, the helper and the update dialog are the kit's, unchanged. `src/update_kit/github_release.c`
+compiles it into the app. The release must not be a draft or a pre-release, its tag must be a
+content version higher than the app's (the workflow tags a release with its `contentVersion`),
+and it must carry `PPSA99017.zip` and a `SHA256SUMS` that lists that ZIP on one well-formed
+line. Its trust is TLS and the release's own `SHA256SUMS`, not the catalog's signature (see the
+header). The app never asks the catalog, which lists ProsperoRadio's own releases: an update from
+there would undo the name, the title, the look and this update source; a build naming
+ProsperoRadio's own repositories does not compile.
+
+For it, `update_check.c` has three more readers, as Nightshade's kit has them
+(`update_check_json_value`, `update_check_json_uint` and `update_check_json_array_next`), and
+refuses a NUL inside a string it copies; `self_update_ps5.c` has `self_update_check_self_from`
+and `self_update_check_as_from`, and its `console_fetch` tells an answer too long for its buffer
+(`SELF_UPDATE_FETCH_TOO_LARGE`) from a failed transfer. The host check is
+`tests/github_release_check.cc`, built and run by `tests/test_github_release.py`
+(`make test-integration`).
+
+A test build still takes `dev/update-offer.txt` in the app's folder instead of GitHub's answer
+(`src/radio_update.cpp`); it skips the release's `SHA256SUMS`.

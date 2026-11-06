@@ -446,7 +446,7 @@ void App::update(const InputFrame &input, float dt, ui::Feedback &feedback)
             update_.offer(newer, feedback);
         else
             session_.toasts.push(ui::StatusKind::info, "Update available",
-                                 "Version " + newer.version + " is on prosperostore.net",
+                                 "Version " + newer.version + " is on GitHub",
                                  kUpdateNoticeSeconds);
     }
     update_.update(dt, feedback);

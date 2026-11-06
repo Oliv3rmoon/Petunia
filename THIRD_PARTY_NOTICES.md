@@ -24,6 +24,9 @@ the application possible:
   PS5 Native App Boilerplate's, with ProsperoEden's changes to the helper; the
   helper unpacks releases with [miniz 3.0.2](https://github.com/richgel999/miniz)
   (MIT, `third_party/miniz/`, licence in the package as `licenses/miniz-MIT.txt`).
+  In Petunia the check asks GitHub for the releases of Oliv3rmoon/Petunia instead of
+  the catalog (`third_party/update_check/github_release.{h,c}`, after Nightshade's,
+  Nightshade TV's and Datura's, Copyright (C) 2026 Oliv3rmoon, GPL-3.0-or-later).
 - **Application stack:** [Radio Browser](https://www.radio-browser.info/),
   [ps5-homebrew-ui](https://github.com/blackbearreloaded/ps5-homebrew-ui)
   (GPL-3.0-or-later) on the [ps5-opengl](https://github.com/blackbearreloaded/ps5-opengl) SDK,
