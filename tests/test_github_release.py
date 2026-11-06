@@ -59,6 +59,25 @@ class GitHubReleaseTest(unittest.TestCase):
         wrapper = (ROOT / "src/update_kit/github_release.c").read_text(encoding="utf-8")
         self.assertIn('#include "../../third_party/update_check/github_release.c"', wrapper)
 
+    def test_a_tag_fills_its_release_and_publishes_nothing_by_itself(self):
+        # A version tag builds the ZIP and SHA256SUMS and puts them on the tag's release: one made
+        # before the tag (a draft) gets them and keeps its state; without one the run makes a
+        # draft pre-release. Andrew publishes a release; a tag never does. The build cache is a
+        # pre-release that is never the latest, so releases/latest never names it.
+        workflow = (ROOT / ".github/workflows/tooling.yml").read_text(encoding="utf-8")
+        self.assertIn('- "[0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9]"', workflow)
+        self.assertIn('gh release upload "$TAG" "${assets[@]}" --repo "$GITHUB_REPOSITORY"', workflow)
+        self.assertIn("--draft --prerelease --latest=false", workflow)
+        self.assertIn('--title "$APP_NAME $TAG"', workflow)
+        self.assertNotIn("--latest\n", workflow)
+        self.assertNotIn("release edit", workflow)
+        self.assertIn('cp "docs/releases/$GITHUB_REF_NAME.md" release-notes.md', workflow)
+        self.assertIn("uses: actions/attest@", workflow)
+        self.assertIn("No build-cache snapshot here; building without one.", workflow)
+        cache = (ROOT / ".github/workflows/build-cache.yml").read_text(encoding="utf-8")
+        self.assertIn("gh release create build-cache --repo \"$GITHUB_REPOSITORY\" --prerelease "
+                      "--latest=false", cache)
+
 
 if __name__ == "__main__":
     unittest.main()

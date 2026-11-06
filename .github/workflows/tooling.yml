@@ -1,10 +1,21 @@
 # ProsperoRadio - Lint, test, build, and release validation.
+# Petunia (Oliv3rmoon/Petunia): a version tag pushed to that repository builds the app folder's
+# ZIP (<title ID>.zip, PPSA99017.zip) and SHA256SUMS, attests the ZIP and puts both on the tag's
+# GitHub release: a release made first (a draft, as every test release is) gets the files and
+# stays as it is; without one, the run makes a draft pre-release, so nothing is published by a
+# tag alone. The app's update check offers published releases (third_party/update_check/
+# github_release.h).
 # Copyright (C) 2026 BlackBearReloaded
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 name: Build
 
 on:
+  # A build on main is started by hand (Run workflow): pushes to main build nothing.
+  push:
+    tags:
+      - "[0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9]"
+  pull_request:
   workflow_dispatch:
     inputs:
       snapshot:
@@ -46,7 +57,12 @@ jobs:
       - name: Install native toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install --yes clang-18 clang-format-18 clang-tidy-18 lld-18 libsqlite3-dev make ccache pkg-config tar unzip wget zip cmake ninja-build meson bison flex python3-mako python3-markupsafe build-essential glslang-tools spirv-tools libegl-dev libgl-dev libzstd-dev
+          sudo apt-get install --yes clang-18 clang-format-18 clang-tidy-18 lld-18 libclang-rt-18-dev libsqlite3-dev make ccache pkg-config tar unzip wget zip cmake ninja-build meson bison flex python3-mako python3-markupsafe build-essential glslang-tools spirv-tools libegl-dev libgl-dev libzstd-dev
+
+      # The ps5-opengl SDK is built from source at the commit tools/build-opengl-sdk.sh pins (its
+      # prebuilt releases went with the original repository), with these Python modules.
+      - name: Install the OpenGL SDK build's Python modules
+        run: python3 -m pip install "meson==1.10.1" PyYAML Mako packaging pyelftools ply Jinja2 pycparser setuptools wheel
 
       - name: Restore compiler cache
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
@@ -63,12 +79,14 @@ jobs:
         run: |
           if [ -z "$(ls -A "$CCACHE_DIR" 2>/dev/null)" ]; then
             url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/build-cache/ccache-clang18.tar"
-            if curl -fsSL --retry 3 -o "$RUNNER_TEMP/ccache-clang18.tar" "$url"; then
-              mkdir -p "$CCACHE_DIR"
-              tar -xf "$RUNNER_TEMP/ccache-clang18.tar" -C "$CCACHE_DIR"
-              rm "$RUNNER_TEMP/ccache-clang18.tar"
+            # This repository's own snapshot; a repository without one (yet) builds from nothing.
+            if curl -fsSL --retry 3 -o "$RUNNER_TEMP/ccache-clang18.tar" "$url" &&
+                mkdir -p "$CCACHE_DIR" && tar -xf "$RUNNER_TEMP/ccache-clang18.tar" -C "$CCACHE_DIR"; then
               echo "::notice title=Compiler cache::Started from the build-cache snapshot."
+            else
+              echo "::notice title=Compiler cache::No build-cache snapshot here; building without one."
             fi
+            rm -f "$RUNNER_TEMP/ccache-clang18.tar"
           fi
 
       - name: Reset compiler cache statistics
@@ -85,8 +103,15 @@ jobs:
             echo "Release tag must exactly match param.json contentVersion: $content_version" >&2
             exit 2
           fi
-          echo "TITLE_ID=$title_id" >> "$GITHUB_ENV"
-          echo "CONTENT_VERSION=$content_version" >> "$GITHUB_ENV"
+          # Petunia: the name and the data name come from param.json too (tools/app-identity.py).
+          app_name=$(python3 tools/app-identity.py --get APP_TITLE_NAME)
+          data_name=$(python3 tools/app-identity.py --get APP_DATA_NAME)
+          {
+            echo "TITLE_ID=$title_id"
+            echo "CONTENT_VERSION=$content_version"
+            echo "APP_NAME=$app_name"
+            echo "DATA_NAME=$data_name"
+          } >> "$GITHUB_ENV"
 
       # A pull request's build is named by its number and its own commit, on the
       # artifact and inside the app folder (docs/PULL_REQUEST_BUILDS.md); the version
@@ -103,7 +128,7 @@ jobs:
             echo "artifact=${GITHUB_REPOSITORY##*/}-PR$PR_NUMBER-$short" >> "$GITHUB_OUTPUT"
             echo "BUILD_LABEL=PR $PR_NUMBER, $short" >> "$GITHUB_ENV"
           else
-            echo "artifact=prospero-radio-$GITHUB_SHA-release" >> "$GITHUB_OUTPUT"
+            echo "artifact=$DATA_NAME-$GITHUB_SHA-release" >> "$GITHUB_OUTPUT"
           fi
 
       # clang-tidy stays a local check (make lint / make tidy); it does not run here.
@@ -122,37 +147,19 @@ jobs:
       - name: Verify generated runtime is unchanged
         run: cd runtime && sha256sum -c libc.prx.sha256
 
-      # tools/build.sh compiles through ccache whenever it is installed.
-      - name: Build maintained PS5 OpenGL SDK
-        run: |
-          git clone --depth 1 https://github.com/mihawk-99/ps5-opengl.git .deps/ps5-opengl-source
-          git -C .deps/ps5-opengl-source rev-parse HEAD
-          make -C .deps/ps5-opengl-source source-fetch
-          python3 -m pip install "meson==1.10.1" PyYAML Mako packaging pyelftools ply Jinja2 pycparser setuptools wheel
-          hash -r
-          meson --version
-          ninja --version
-          glslangValidator --version
-          bash tools/setup-native-dependencies.sh
-          sdk="$PWD/.deps/native/ps5-payload-sdk"
-          test -x "$sdk/bin/prospero-clang" || { echo "::error::PS5 compiler missing"; exit 1; }
-          file=".deps/ps5-opengl-source/src/gallium/ps5/ps5_screen.c"
-          receipt=".deps/ps5-opengl-source/tests/ps5/test_compute_render.py"
-          test -f "$file" && test -f "$receipt"
-          new_hash=$(sha256sum "$file" | cut -d " " -f1)
-          sed -i -E "/src\/gallium\/ps5\/ps5_screen\.c/s/[[:xdigit:]]{64}/$new_hash/" "$receipt"
-          grep -Fq "$new_hash" "$receipt" || { echo "::error::OpenGL source receipt was not updated"; exit 1; }
-          if ! make -C .deps/ps5-opengl-source sdk PS5_PAYLOAD_SDK="$sdk" > "$RUNNER_TEMP/opengl-build.log" 2>&1; then
-            grep -nEi "error:|No such file|ModuleNotFound|FAILED" "$RUNNER_TEMP/opengl-build.log" | tail -n 25 || true
-            tail -n 50 "$RUNNER_TEMP/opengl-build.log"
-            exit 1
-          fi
-          tail -n 12 "$RUNNER_TEMP/opengl-build.log"
-          prefix="$PWD/.deps/ps5-opengl-source/build/sdk/ps5-opengl-gl46"
-          test -f "$prefix/manifest.sha256" || { echo "::error::SDK manifest missing"; exit 1; }
-          test -f "$prefix/lib/libPS5OpenGL.a" || { echo "::error::OpenGL library missing"; exit 1; }
-          echo "PS5_OPENGL_PREFIX=$prefix" >> "$GITHUB_ENV"
+      # The SDK build takes a while and only changes with the pinned commit: keep the finished SDK.
+      - name: Restore the ps5-opengl SDK
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: |
+            .deps/ps5-opengl-source/build/sdk
+            .deps/ps5-opengl-source/build/.sdk-commit
+          key: ps5-opengl-sdk-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/build-opengl-sdk.sh') }}
 
+      - name: Build the ps5-opengl SDK
+        run: bash tools/prepare-opengl.sh
+
+      # tools/build.sh compiles through ccache whenever it is installed.
       - name: Build the app folder
         run: make app
 
@@ -188,12 +195,20 @@ jobs:
           unzip -t "$TITLE_ID.zip"
           unzip -Z1 "$TITLE_ID.zip" | grep -Fx "$TITLE_ID/eboot.bin"
           unzip -Z1 "$TITLE_ID.zip" | grep -Fx "$TITLE_ID/sce_sys/param.json"
-          python3 - "$TITLE_ID.zip" <<'PY'
-          import sys, zipfile
-          with zipfile.ZipFile(sys.argv[1]) as z:
+          unzip -Z1 "$TITLE_ID.zip" | grep -Fx "$TITLE_ID/sce_sys/icon0.png"
+          python3 - "$TITLE_ID.zip" "$TITLE_ID" "$CONTENT_VERSION" "$APP_NAME" <<'PY'
+          import json, sys, zipfile
+          path, title, version, name = sys.argv[1:]
+          with zipfile.ZipFile(path) as z:
               wrong = [i.filename for i in z.infolist() if (i.external_attr >> 16) & 0o777 != 0o777]
               assert not wrong, f"entries not stored as 0777: {wrong[:3]}"
-              print(f"{sys.argv[1]}: {len(z.infolist())} entries, all 0777")
+              # Petunia: the ZIP holds the app it names, and not the logo's source.
+              assert not [n for n in z.namelist() if "/assets/branding/" in n], "assets/branding packaged"
+              param = json.loads(z.read(f"{title}/sce_sys/param.json"))
+              shown = param["localizedParameters"]["en-US"]["titleName"]
+              assert (param["titleId"], param["contentVersion"], shown) == (title, version, name), \
+                  f"param.json is {param['titleId']} {param['contentVersion']} {shown!r}"
+              print(f"{path}: {len(z.infolist())} entries, all 0777; {title} {version} {shown!r}")
           PY
 
       - name: Write release checksums
@@ -229,13 +244,30 @@ jobs:
       contents: write
 
     steps:
+      - name: Check out the identity and the release notes
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: |
+            sce_sys/param.json
+            tools/app-identity.py
+            CHANGELOG.md
+            docs/releases
+          sparse-checkout-cone-mode: false
+
+      - name: Read the app's name
+        run: |
+          {
+            echo "APP_NAME=$(python3 tools/app-identity.py --get APP_TITLE_NAME)"
+            echo "DATA_NAME=$(python3 tools/app-identity.py --get APP_DATA_NAME)"
+          } >> "$GITHUB_ENV"
+
       - name: Download verified build
         env:
           GH_TOKEN: ${{ github.token }}
         run: >-
           gh run download "$GITHUB_RUN_ID"
           --repo "$GITHUB_REPOSITORY"
-          --name "prospero-radio-$GITHUB_SHA-release"
+          --name "$DATA_NAME-$GITHUB_SHA-release"
           --dir release
 
       - name: Prepare release assets
@@ -256,7 +288,30 @@ jobs:
           echo "archive=${archives[0]}" >> "$GITHUB_OUTPUT"
           echo "checksum=SHA256SUMS" >> "$GITHUB_OUTPUT"
 
-      - name: Publish GitHub release
+      # docs/releases/<tag>.md is the release's page when there is one; otherwise the tag's
+      # section of CHANGELOG.md. Used only when this run makes the release.
+      - name: Prepare release notes
+        shell: bash
+        run: |
+          if [[ -f docs/releases/$GITHUB_REF_NAME.md ]]; then
+            cp "docs/releases/$GITHUB_REF_NAME.md" release-notes.md
+            exit 0
+          fi
+          awk -v version="$GITHUB_REF_NAME" '
+            $0 == "## " version { found=1; next }
+            found && /^## / { exit }
+            found { print }
+            END { if (!found) exit 2 }
+          ' CHANGELOG.md > release-notes.md
+          test -s release-notes.md
+
+      # Petunia: as Dulcamara's build.yml. The files of a release come from the run of its tag,
+      # once. A release that is there already (a draft made before the tag, or notes written in
+      # advance) gets them and keeps its title, notes and state: a draft stays a draft until it is
+      # dropped. One that already has a ZIP is never touched, because the update check takes that
+      # ZIP's checksum from its SHA256SUMS. Without a release, the run makes a draft pre-release:
+      # a tag alone publishes nothing.
+      - name: Put the files on the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
           ARCHIVE: ${{ steps.package.outputs.archive }}
@@ -266,22 +321,19 @@ jobs:
           set -euo pipefail
           assets=("release/$ARCHIVE" "release/$CHECKSUM")
           TAG=$GITHUB_REF_NAME
-          # CI is the source of truth for release files: create the release, or fill one that
-          # has no ZIP yet, and never replace a ZIP that is already published.
-          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          if names=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' 2>/dev/null); then
+            if grep -qx "$ARCHIVE" <<< "$names"; then
+              echo "::warning title=Release files not from this run::The release $TAG already has $ARCHIVE; it was not replaced. Its files were not published by this run and may have no attestation."
+            else
+              gh release upload "$TAG" "${assets[@]}" --repo "$GITHUB_REPOSITORY"
+            fi
+          else
             gh release create "$TAG" "${assets[@]}" \
               --repo "$GITHUB_REPOSITORY" \
               --verify-tag \
-              --generate-notes \
-              --title "ProsperoRadio $TAG"
-            exit 0
+              --draft --prerelease --latest=false \
+              --notes-file release-notes.md \
+              --title "$APP_NAME $TAG"
           fi
-          existing=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name')
-          while IFS= read -r name; do
-            if [[ $name == *.zip ]]; then
-              echo "::warning title=Release files not from this run::A release for $TAG already has a ZIP; it was not replaced. Its files were not published by this run and may have no attestation."
-              exit 0
-            fi
-          done <<< "$existing"
-          # Notes written in advance, or a draft: add the two files, leave title and notes alone.
-          gh release upload "$TAG" "${assets[@]}" --repo "$GITHUB_REPOSITORY"
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isDraft,isPrerelease,assets \
+            --jq '"draft: \(.isDraft), pre-release: \(.isPrerelease), files: \([.assets[].name] | join(", "))"'
