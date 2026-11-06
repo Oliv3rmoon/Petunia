@@ -56,16 +56,16 @@ paths at the same time; `make undeploy` deletes such an image.
 
 ## Deploy a release ZIP
 
-`PPSA99001.zip` is a transport archive of the same complete folder produced by
+`PPSA99017.zip` is a transport archive of the same complete folder produced by
 `make app`; it is not itself a loader image. Extract it on the computer, then
-upload the resulting `PPSA99001/` directory recursively so the final path is:
+upload the resulting `PPSA99017/` directory recursively so the final path is:
 
 ```text
-/data/homebrew/PPSA99001/
+/data/homebrew/PPSA99017/
 ```
 
 This is equivalent to the default folder deployment. Upload the complete tree,
-not only `eboot.bin`, and do not upload `PPSA99001.zip` unchanged. Remove any
+not only `eboot.bin`, and do not upload `PPSA99017.zip` unchanged. Remove any
 same-title image (`.ffpkg`, or an `.ffpfsc` from an earlier release) from `/data/homebrew` before restarting
 ShadowMountPlus or the PS5.
 

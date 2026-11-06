@@ -4,7 +4,7 @@ ProsperoRadio uses [PS5-Lapy-JB-Daemon](https://github.com/ArkSama/PS5-Lapy-JB-D
 created by ArkSama, and pins the cooperative owned-root implementation from
 [ProsperoRadio's Lapy fork](https://github.com/blackbearreloaded/PS5-Lapy-JB-Daemon), based on
 [mpereiraesaa's cooperative helper](https://github.com/mpereiraesaa/PS5-Lapy-JB-Daemon). The build invokes
-upstream's own `owned-helper` target for `PPSA99001`; it does not copy or modify Lapy's privileged
+upstream's own `owned-helper` target for the app's title (`PPSA99017`, from `sce_sys/param.json`); it does not copy or modify Lapy's privileged
 source. Before packaging, it verifies the generated manifest's title, mode, ELF and protocol
 hashes, and `root_layout_probe_retry` feature.
 

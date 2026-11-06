@@ -5,7 +5,8 @@
 > on SDL2's software renderer). On `main` the interface is OpenGL on
 > [ps5-homebrew-ui](https://github.com/blackbearreloaded/ps5-homebrew-ui)
 > (see [`ui-kit/README.md`](../ui-kit/README.md)), networking is libcurl, and
-> data lives in `/data/prosperoradio`; these sections are being rewritten.
+> data lives in `/data/prosperoradio` (in Petunia, `/data/petunia`); these sections are
+> being rewritten.
 
 ProsperoRadio separates deterministic host regressions from behaviour that only a
 real PS5 can prove. Host tests never contact a console or a public Radio
@@ -72,7 +73,7 @@ For a release candidate:
    contentVersion.
 2. Follow the repository's current console coordination protocol before
    connecting to shared hardware.
-3. Deploy the whole dist/PPSA99001/ folder.
+3. Deploy the whole dist/PPSA99017/ folder.
 4. Launch the Media-category title, verify browsing, search, favourites,
    playback/stop/switch, one non-ASCII station name, and a cached restart.
 5. Capture the result and relevant logs; close the title and any Remote Play

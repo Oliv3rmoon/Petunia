@@ -5,7 +5,8 @@
 > on SDL2's software renderer). On `main` the interface is OpenGL on
 > [ps5-homebrew-ui](https://github.com/blackbearreloaded/ps5-homebrew-ui)
 > (see [`ui-kit/README.md`](../ui-kit/README.md)), networking is libcurl, and
-> data lives in `/data/prosperoradio`; these sections are being rewritten.
+> data lives in `/data/prosperoradio` (in Petunia, `/data/petunia`); these sections are
+> being rewritten.
 
 ProsperoRadio is layered on a clean clone of
 [`ps5-native-app-boilerplate`](https://github.com/blackbearreloaded/ps5-native-app-boilerplate)
@@ -77,7 +78,7 @@ single `{{PROSPERO_RADIO_VERSION}}` placeholder in the copied RML document with
 `contentVersion` from `sce_sys/param.json`. The source document retains the
 placeholder; no second version file exists.
 
-The title is always `PPSA99001`, with a Media category. Keep the title ID
+The title is always `PPSA99017` (Petunia), with a Media category. Keep the title ID
 stable for updates. See [Configuration](CONFIGURATION.md).
 
 ## Verification
@@ -91,8 +92,8 @@ make check
 `make test` includes GoogleTest checks for C++ text/import parsing, Python
 checks for tools and UI metadata, and the 16 retained C codec/catalogue
 regressions. `make app` compiles and validates the native FSELF before
-assembling `dist/PPSA99001/`. CI publishes only the complete app
-folder as `PPSA99001.zip`.
+assembling `dist/PPSA99017/`. CI publishes only the complete app
+folder as `PPSA99017.zip`.
 
 The port's final hardware evidence is intentionally separate from these
 repeatable host gates. Follow [Testing](TESTING.md) for the exact console

@@ -5,7 +5,8 @@
 > on SDL2's software renderer). On `main` the interface is OpenGL on
 > [ps5-homebrew-ui](https://github.com/blackbearreloaded/ps5-homebrew-ui)
 > (see [`ui-kit/README.md`](../ui-kit/README.md)), networking is libcurl, and
-> data lives in `/data/prosperoradio`; these sections are being rewritten.
+> data lives in `/data/prosperoradio` (in Petunia, `/data/petunia`); these sections are
+> being rewritten.
 
 ProsperoRadio is a C++20 application. RmlUi owns document layout, SDL2 owns
 presentation, and PS5 platform services provide networking, input, text entry,

@@ -21,8 +21,8 @@ build with `MESA_ARCHIVE=/path/to/mesa-26.2.0.tar.xz make`.
 
 ## 2. Clone and inspect
 
-    git clone git@github.com:bornaradusin/ProsperoRadio.git
-    cd prospero-radio
+    git clone git@github.com:Oliv3rmoon/Petunia.git
+    cd Petunia
     make doctor
 
 The doctor command is read-only. It reports missing requirements without
@@ -36,13 +36,16 @@ The first build verifies and caches the public PS5 Payload SDK, zlib, the
 PacBrew SQLite port, and the clean-room runtime inputs below ignored .deps/.
 It then creates:
 
-    dist/PPSA99001/
+    dist/PPSA99017/
       eboot.bin
       sce_module/libc.prx
       sce_sys/param.json
       assets/ui/
 
-The title is ProsperoRadio, title ID PPSA99001, and a Media-category application.
+The title is Petunia, title ID PPSA99017, and a Media-category application. Both,
+and the data folder (`/data/petunia`) and the repository the update check asks
+(Oliv3rmoon/Petunia), come from `sce_sys/param.json` alone: `tools/app-identity.py`
+reads them for the build.
 
 ## 4. Run host checks
 
@@ -60,9 +63,9 @@ metadata, shell deployment dry runs, formatting, and static analysis.
 
 This produces the complete title folder:
 
-    dist/PPSA99001/
+    dist/PPSA99017/
 
-Never deploy only eboot.bin. GitHub Releases contain `PPSA99001.zip`, which
+Never deploy only eboot.bin. GitHub Releases contain `PPSA99017.zip`, which
 wraps that folder for direct directory deployment, and its SHA256SUMS.
 
 ## 6. Deploy a development folder
@@ -76,21 +79,22 @@ publishes critical files last. It does not launch the title or modify Shell
 registration. Use the current project console protocol for launch, logs,
 screenshots, Remote Play cleanup, and any shared-console coordination.
 
-For the release ZIP, extract it locally and send the entire `PPSA99001/`
-folder to `/data/homebrew/PPSA99001/`. Do not send the ZIP file itself, and do
+For the release ZIP, extract it locally and send the entire `PPSA99017/`
+folder to `/data/homebrew/PPSA99017/`. Do not send the ZIP file itself, and do
 not leave a same-title FFPFSC image from an earlier release beside the folder.
 
 ## Version and title identity
 
 sce_sys/param.json is the single version source. Its contentVersion appears in
-the packaged metadata, ProsperoRadio top bar, Git tag, and GitHub Release. Use the
+the packaged metadata, Petunia's About page, Git tag, and GitHub Release. Use the
 exact PS5 format NN.NNN.NNN, with no v prefix.
 
-Keep PPSA99001 stable for ProsperoRadio updates. Increment contentVersion before
-creating a release tag:
+Keep PPSA99017 stable for Petunia updates. Increment contentVersion before
+creating a release tag; make the release a draft first (see
+[Release ZIP](RELEASE_ZIP.md)), then push a signed tag:
 
-    git tag 01.000.005
-    git push origin main 01.000.005
+    git tag -s 01.001.000 -m "Petunia 01.001.000"
+    git push origin main 01.001.000
 
 GitHub Actions rejects a tag that does not exactly match contentVersion and
 publishes the verified app-folder ZIP and its SHA-256 checksum.

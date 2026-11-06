@@ -1,7 +1,8 @@
 # Contributing
 
-Keep ProsperoRadio reproducible, responsive on the console, and compatible with the
-native-app-boilerplate build contract.
+Keep Petunia reproducible, responsive on the console, and compatible with the
+native-app-boilerplate build contract. Bugs that are ProsperoRadio's own are
+worth reporting to [bornaradusin/ProsperoRadio](https://github.com/bornaradusin/ProsperoRadio) too.
 
 Before opening a change:
 

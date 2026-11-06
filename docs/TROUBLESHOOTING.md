@@ -129,7 +129,7 @@ new generated directory. Do not attempt to write to `/app0`.
 
 ## ProsperoRadio reports `Database unavailable`
 
-- Confirm `/download0` is mounted and writable for `PPSA99001`.
+- Confirm `/download0` is mounted and writable for `PPSA99017`.
 - Build the current source instead of linking an older `sqlite_compat.cpp`.
   `make app` verifies that both `lstat` and `fchown` resolve to ProsperoRadio's local
   SQLite compatibility boundary.

@@ -10,7 +10,7 @@ console before merging.
 
 | | Pull request | Tag, or a run started by hand |
 | --- | --- | --- |
-| Artifact name | `ProsperoRadio-PR<number>-<commit>` | `prospero-radio-<commit>-release` |
+| Artifact name | `Petunia-PR<number>-<commit>` | `petunia-<commit>-release` |
 | `<commit>` | First seven characters of the pull request's own head commit | The full commit that was built |
 | Label file in the app folder | `build-label.txt` holding `PR <number>, <commit>` | None |
 | `contentVersion` | Unchanged | Unchanged |
@@ -36,7 +36,7 @@ Two details are deliberate:
    page under **Actions**).
 2. Download the artifact named `ProsperoRadio-PR<number>-<commit>` from the
    run's **Artifacts** list. GitHub requires a signed-in account for this.
-3. Unpack it: it holds `PPSA99001.zip` (the app folder, every entry stored as
+3. Unpack it: it holds `PPSA99017.zip` (the app folder, every entry stored as
    0777) and `SHA256SUMS`. There is no image file: the app updates itself in
    place, which needs a folder install. Check the ZIP with
    `sha256sum -c SHA256SUMS`, then install as described in
@@ -73,7 +73,7 @@ BUILD_LABEL="pacing test 2" make
 ## Names and safety
 
 The pull-request name follows the repository's name by itself. The name used
-for tags and runs started by hand, `prospero-radio-<commit>-release`, appears twice in the
+for tags and runs started by hand, `petunia-<commit>-release`, appears twice in the
 workflow (the upload, and the release job's download); rename both together. A
 tag never takes the pull-request branch, so the release job always finds its
 build under that name.
