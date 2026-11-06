@@ -127,7 +127,7 @@ HomeScreen::HomeScreen(Session &session) : session_(session), rail_(session.them
     empty_.style.max_text_width = 760.0f;
     empty_.set_bounds({460.0f, 250.0f, 1000.0f, 520.0f});
     empty_.icon = [](ui::Canvas &canvas, const Rect &area)
-    { canvas.list.star(area.cx(), area.cy(), area.w * 0.46f, tone::teal, 3.5f); };
+    { canvas.list.star(area.cx(), area.cy(), area.w * 0.46f, tone::accent, 3.5f); };
 }
 
 void HomeScreen::enter()
@@ -457,7 +457,7 @@ void HomeScreen::draw_hero_text(ui::Canvas &canvas, const radio_station_t &stati
         std::snprintf(text, sizeof(text), "FAVORITE");
         break;
     }
-    ui::text(list, fonts.semibold, text, x, 164.0f + rise(0), 18.0f, tone::teal, gfx::Align::left,
+    ui::text(list, fonts.semibold, text, x, 164.0f + rise(0), 18.0f, tone::accent, gfx::Align::left,
              4.0f);
     list.pop_opacity();
 
@@ -574,7 +574,7 @@ void HomeScreen::draw_player(ui::Canvas &canvas, float alpha) const
     const char *state = on_air              ? "NOW PLAYING  \xC2\xB7  LIVE"
                         : session_.active() ? "NOW PLAYING  \xC2\xB7  TUNING IN"
                                             : "LAST PLAYED";
-    ui::text(list, fonts.semibold, state, kPlayerX, 160.0f, 18.0f, on_air ? bright : tone::teal,
+    ui::text(list, fonts.semibold, state, kPlayerX, 160.0f, 18.0f, on_air ? bright : tone::accent,
              gfx::Align::left, 4.0f);
     const float width = kPlayerRight - kPlayerX;
     const float size = fonts.display.measure(station.name, 72.0f) <= width ? 72.0f : 56.0f;
@@ -588,7 +588,7 @@ void HomeScreen::draw_player(ui::Canvas &canvas, float alpha) const
     const float bar = width / static_cast<float>(kBars) * 0.36f;
     const float pitch = (width - bar) / static_cast<float>(kBars - 1);
     const Color top = gfx::mix(accent, kWhite, 0.45f);
-    const Color bottom = gfx::mix(Color::rgb(0x0b1220), accent, 0.5f);
+    const Color bottom = gfx::mix(tone::night, accent, 0.5f);
     for (int i = 0; i < kBars; ++i)
     {
         const float level = session_.levels[static_cast<std::size_t>(i)];
@@ -624,7 +624,7 @@ void HomeScreen::draw_player(ui::Canvas &canvas, float alpha) const
                 (i == kPrevious && !session_.can_zap(-1)) || (i == kNext && !session_.can_zap(1));
             list.circle(cx, kTransportY, kButtonRadius, kWhite.with_alpha(focus ? 0.18f : 0.08f));
             list.ring(cx, kTransportY, kButtonRadius, 1.5f, kWhite.with_alpha(0.16f));
-            const Color ink = dead ? Color::rgb(0x6c7480) : (focus ? kWhite : Color::rgb(0xd4d7e2));
+            const Color ink = dead ? Color::rgb(0x6e6e76) : (focus ? kWhite : Color::rgb(0xd6d6dc));
             if (i == kStar)
             {
                 const bool on = radio_service_is_favorite(station.uuid);

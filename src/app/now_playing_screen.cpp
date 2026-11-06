@@ -101,8 +101,8 @@ NowPlayingScreen::NowPlayingScreen(Session &session) : session_(session)
     list_amount_.snap(1.0f);
     live_.snap(0.0f);
     ring_.snap(ring_target());
-    accent_.snap(tone::teal);
-    body_.snap(Color::rgb(0x0b3140));
+    accent_.snap(tone::accent);
+    body_.snap(tone::olive);
 }
 
 void NowPlayingScreen::enter()
@@ -463,7 +463,7 @@ void NowPlayingScreen::draw_artwork(gfx::DrawList &list, const ui::Fonts &fonts,
         list.shadow({r.x, r.y + 28.0f, r.w, r.h}, kArtRadius, 50.0f, Color::rgb(0x000000, 0.5f));
         draw_station_art(list, fonts, r, kArtRadius, station);
         // Artwork that is not on air also loses a little light.
-        list.rounded_rect(r, kArtRadius, Color::rgb(0x05080c, 0.3f * (1.0f - live)));
+        list.rounded_rect(r, kArtRadius, Color::rgb(0x050506, 0.3f * (1.0f - live)));
         list.pop_opacity();
     };
     if (swap_.running && has_previous_)
@@ -736,9 +736,9 @@ void NowPlayingScreen::draw_transport(ui::Canvas &canvas, const Layout &l) const
             list.circle(cx, y, kButtonRadius, kWhite.with_alpha(focused ? 0.18f : 0.08f));
             list.ring(cx, y, kButtonRadius, 1.5f, kWhite.with_alpha(0.16f));
             // Opaque on purpose: an icon is several strokes that overlap.
-            const Color ink = dead  ? Color::rgb(0x6c7480)
+            const Color ink = dead  ? Color::rgb(0x6e6e76)
                               : lit ? accent
-                                    : (focused ? kWhite : Color::rgb(0xd4d7e2));
+                                    : (focused ? kWhite : Color::rgb(0xd6d6dc));
             if (i == kFavorite)
                 list.star(cx, y - 1.0f, 15.0f + 8.0f * star_.value, is_favorite_ ? tone::gold : ink,
                           is_favorite_ ? 0.0f : 2.5f);

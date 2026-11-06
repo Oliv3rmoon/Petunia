@@ -434,7 +434,7 @@ void ControlRoom::draw_about(ui::Canvas &canvas, const Rect &box) const
     const ui::Fonts &fonts = canvas.fonts;
     const ui::Theme &theme = session_.theme;
     float y = box.y + 30.0f;
-    draw_logo(list, box.x + 34.0f, y + 6.0f, 52.0f, tone::teal);
+    draw_logo(list, box.x + 34.0f, y + 6.0f, 52.0f, tone::accent);
     ui::text(list, fonts.display, APP_TITLE_NAME, box.x + 84.0f, y + 20.0f, 40.0f, theme.text);
     ui::text(list, fonts.mono, "Version " + version_, box.x + 84.0f, y + 58.0f, 22.0f,
              theme.text_muted);
@@ -446,7 +446,7 @@ void ControlRoom::draw_about(ui::Canvas &canvas, const Rect &box) const
     {
         ui::text(list, fonts.regular, credit[0], box.x, y, 25.0f, theme.text_muted);
         ui::text(list, fonts.semibold, credit[1], box.x + fonts.regular.measure(credit[0], 25.0f),
-                 y, 25.0f, tone::teal);
+                 y, 25.0f, tone::accent);
         y += 42.0f;
     }
     y += 22.0f;
@@ -488,7 +488,7 @@ void ControlRoom::draw(ui::Canvas &canvas) const
                         gfx::kVirtualHeight * 0.5f, 0.0f, 0.0f);
 
     // ---- the page's title ----
-    ui::text(list, fonts.semibold, "CONTROL ROOM", kMargin, 132.0f, 18.0f, tone::teal,
+    ui::text(list, fonts.semibold, "CONTROL ROOM", kMargin, 132.0f, 18.0f, tone::accent,
              gfx::Align::left, 4.0f);
     ui::text(list, fonts.display, "Settings", kMargin - 3.0f, 214.0f, 76.0f, theme.text);
     nav_.draw(canvas);
@@ -505,9 +505,9 @@ void ControlRoom::draw(ui::Canvas &canvas) const
         const float alpha = std::min(1.0f, saved_);
         list.push_opacity(alpha);
         const Rect chip{kPanel.x + kPanel.w - kPad - 128.0f, kPanel.y + 38.0f, 128.0f, 44.0f};
-        list.rounded_rect(chip, 22.0f, tone::teal.with_alpha(0.16f));
-        list.bordered_rect(chip, 22.0f, kClear, 1.5f, tone::teal.with_alpha(0.5f));
-        list.circle(chip.x + 26.0f, chip.cy(), 10.0f, tone::teal);
+        list.rounded_rect(chip, 22.0f, tone::accent.with_alpha(0.16f));
+        list.bordered_rect(chip, 22.0f, kClear, 1.5f, tone::accent.with_alpha(0.5f));
+        list.circle(chip.x + 26.0f, chip.cy(), 10.0f, tone::accent);
         list.line(chip.x + 21.0f, chip.cy(), chip.x + 25.0f, chip.cy() + 4.0f, 2.5f, tone::ink);
         list.line(chip.x + 25.0f, chip.cy() + 4.0f, chip.x + 31.0f, chip.cy() - 4.0f, 2.5f,
                   tone::ink);

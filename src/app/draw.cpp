@@ -197,7 +197,7 @@ void draw_station_tile(ui::Canvas &canvas, const Session &session, const Rect &c
     // At rest a tile is a veil over the page. In focus it turns solid: the
     // light the grid puts around it must not shine through and wash the text.
     list.rounded_rect(cell, kRadius,
-                      gfx::mix(kWhite.with_alpha(0.06f), Color::rgb(0x1c2e39, 0.97f), focus));
+                      gfx::mix(kWhite.with_alpha(0.06f), tone::row_lit.with_alpha(0.97f), focus));
     list.bordered_rect(cell, kRadius, kClear, 1.5f, kWhite.with_alpha(0.12f + 0.14f * focus));
     const Rect art{cell.x + 24.0f, cell.cy() - kArt * 0.5f, kArt, kArt};
     draw_station_art(list, fonts, art, 18.0f, station);
@@ -216,7 +216,8 @@ void draw_station_tile(ui::Canvas &canvas, const Session &session, const Rect &c
     const bool current = session.is_current(station);
     float row = x;
     if (!rank.empty())
-        row += ui::text(list, fonts.mono, rank, row, cell.cy() + 46.0f, 18.0f, tone::teal) + 12.0f;
+        row +=
+            ui::text(list, fonts.mono, rank, row, cell.cy() + 46.0f, 18.0f, tone::accent) + 12.0f;
     if (current)
     {
         // On air, the line says so instead of repeating a number.

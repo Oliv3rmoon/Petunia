@@ -67,7 +67,7 @@ LetterScreen::LetterScreen(Session &session) : session_(session)
         const Color tint = station != nullptr ? art_colors(station->uuid).accent : kWhite;
         list.rounded_rect(
             cell, 18.0f,
-            gfx::mix(Color::rgb(0x121b27), gfx::mix(Color::rgb(0x121b27), tint, 0.3f), focus));
+            gfx::mix(Color::rgb(0x141418), gfx::mix(Color::rgb(0x141418), tint, 0.3f), focus));
         if (station == nullptr)
         {
             list.rounded_rect({cell.x + 14.0f, cell.y + 12.0f, 60.0f, 60.0f}, 12.0f,
@@ -102,7 +102,7 @@ LetterScreen::LetterScreen(Session &session) : session_(session)
         }
         ui::text(list, fonts.regular,
                  fonts.regular.font->fit(place_line(*station), 20.0f, room - (after - x)), after,
-                 cell.y + 66.0f, 20.0f, current ? tone::teal : theme.text_muted);
+                 cell.y + 66.0f, 20.0f, current ? tone::accent : theme.text_muted);
     };
     list_.accent = [this](int index)
     {
@@ -129,7 +129,7 @@ LetterScreen::LetterScreen(Session &session) : session_(session)
     empty_.style.max_text_width = 760.0f;
     empty_.set_bounds({460.0f, 250.0f, 1000.0f, 520.0f});
     empty_.icon = [](ui::Canvas &canvas, const Rect &area)
-    { canvas.list.star(area.cx(), area.cy(), area.w * 0.46f, tone::teal, 3.5f); };
+    { canvas.list.star(area.cx(), area.cy(), area.w * 0.46f, tone::accent, 3.5f); };
 }
 
 void LetterScreen::enter()
@@ -337,7 +337,7 @@ void LetterScreen::draw_details(ui::Canvas &canvas, const radio_station_t &stati
     const bool current = session_.is_current(station);
     const char *label = current ? (session_.on_air() ? "NOW PLAYING" : "TUNING IN") : "FAVORITE";
     ui::text(list, fonts.semibold, label, kDetailX, y - 26.0f, 17.0f,
-             current ? tone::live : tone::teal, gfx::Align::left, 4.0f);
+             current ? tone::live : tone::accent, gfx::Align::left, 4.0f);
     const char *name = trimmed(station.name);
     const float size = fonts.display.measure(name, 44.0f) <= kDetailW ? 44.0f : 34.0f;
     ui::text(list, fonts.display, fonts.display.font->fit(name, size, kDetailW), kDetailX,

@@ -46,8 +46,8 @@ constexpr float kNoteSize = 21.0f;
 constexpr float kNoteHeadingSize = 25.0f;
 constexpr float kClosingSeconds = 3.0f;
 constexpr float kPi = 3.14159265f;
-constexpr float kTop = -kPi * 0.5f; // twelve o'clock
-const Color kPale = Color::rgb(0xc9f4f3);
+constexpr float kTop = -kPi * 0.5f;       // twelve o'clock
+const Color kPale = Color::rgb(0xe4f5c0); // Petunia: a pale chartreuse
 const Color kAmber = Color::rgb(0xf5a524);
 
 std::string megabytes(std::uint64_t bytes)
@@ -444,7 +444,7 @@ void UpdateDialog::draw_notes(ui::Canvas &canvas, float height) const
     gfx::DrawList &list = canvas.list;
     const ui::Fonts &fonts = canvas.fonts;
     const ui::Theme &theme = session_.theme;
-    const Color accent = tone::teal;
+    const Color accent = tone::accent;
     const float t = stage_time_;
     const float arrive = tween::cubic_out(t / 0.35f);
 
@@ -581,7 +581,7 @@ void UpdateDialog::draw(ui::Canvas &canvas) const
     const float t = stage_time_;
     const float breathe = 0.5f + 0.5f * std::sin(canvas.time * 2.4f);
     const bool failed = stage_ == Stage::failed;
-    const Color accent = failed ? kAmber : tone::teal;
+    const Color accent = failed ? kAmber : tone::accent;
     const Color title = theme.text;
     const Color copy = theme.text_muted;
 

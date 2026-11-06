@@ -99,8 +99,8 @@ App::App(const ui::Fonts &fonts, std::uint32_t glass_texture, std::string versio
                       "this console.",
                       "Keep the console online until it finishes."});
 
-    lean_.snap(tone::teal);
-    lean_dark_.snap(Color::rgb(0x263c8a));
+    lean_.snap(tone::accent);
+    lean_dark_.snap(tone::olive);
     tab_changed();
     // How the listener left the app last time, the sound included.
     session_.load_settings();
@@ -516,7 +516,7 @@ void App::draw_header(ui::Canvas &canvas) const
 {
     gfx::DrawList &list = canvas.list;
     const ui::Fonts &fonts = canvas.fonts;
-    draw_logo(list, kMargin + 22.0f, kHeaderY, 44.0f, tone::teal);
+    draw_logo(list, kMargin + 22.0f, kHeaderY, 44.0f, tone::accent);
     ui::text(list, fonts.display, APP_TITLE_NAME, kMargin + 58.0f, baseline_for(kHeaderY, 30.0f),
              30.0f, session_.theme.text);
 
@@ -555,7 +555,7 @@ float App::draw_mini_player(ui::Canvas &canvas, const Rect &bar) const
     {
     case RADIO_PLAYBACK_PLAYING:
         state = "NOW PLAYING";
-        tint = tone::teal;
+        tint = tone::accent;
         break;
     case RADIO_PLAYBACK_CONNECTING:
     case RADIO_PLAYBACK_BUFFERING:
